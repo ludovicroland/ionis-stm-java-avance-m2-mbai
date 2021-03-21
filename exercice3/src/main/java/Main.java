@@ -17,7 +17,7 @@ final class Main
   {
     try
     {
-      final Connection connection = DriverManager.getConnection("jdbc:sqlite:exercice1/src/main/resources/chinook.db");
+      final Connection connection = DriverManager.getConnection("jdbc:sqlite:exercice3/src/main/resources/chinook.db");
       final Statement playlistStatement = connection.createStatement();
       final ResultSet playlistResultSet = playlistStatement.executeQuery("SELECT * FROM playlists");
 

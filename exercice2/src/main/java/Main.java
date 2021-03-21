@@ -27,7 +27,7 @@ final class Main
       System.out.println("Quel est votre nom ?");
       final String lastname = scanner.nextLine();
 
-      final Connection connection = DriverManager.getConnection("jdbc:sqlite:exercice1/src/main/resources/chinook.db");
+      final Connection connection = DriverManager.getConnection("jdbc:sqlite:exercice2/src/main/resources/chinook.db");
 
       //numéro de la facture
       //montant de la facture
