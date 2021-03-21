@@ -3,7 +3,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Scanner;
 
 /**
@@ -18,44 +17,94 @@ final class Main
     try
     {
       final Scanner scanner = new Scanner(System.in);
+      System.out.println("Saisir votre identifiant personnel :");
+      final int customerId = scanner.nextInt();
+      scanner.nextLine();
 
-      System.out.println("Saisir le nom de l'artiste à ajouter :");
-      final String artist = scanner.nextLine();
+      final Connection connection = DriverManager.getConnection("jdbc:sqlite:exercice4/src/main/resources/chinook.db");
 
-      System.out.println("Ajout de l'artist : " + artist);
+      final PreparedStatement customer = connection.prepareStatement("SELECT * FROM customers WHERE CustomerId = ?");
+      customer.setInt(1, customerId);
 
-      final Connection connection = DriverManager.getConnection("jdbc:sqlite:exercice5/src/main/resources/chinook.db");
+      final ResultSet resultSet = customer.executeQuery();
 
-      //Alternative possible : faire une requête de sélection pour retrouver le nouvel identifiant de notre artist
-      final PreparedStatement artistStatement = connection.prepareStatement("INSERT INTO artists (Name) VALUES (?)", Statement.RETURN_GENERATED_KEYS);
-      artistStatement.setString(1, artist);
-      artistStatement.executeUpdate();
+      //nom
+      //prenom
+      //phone
+      //mail
 
-      final ResultSet artistResultSet = artistStatement.getGeneratedKeys();
-
-      if(artistResultSet.next() == true)
+      if (resultSet.next() == true)
       {
-        final int artistId = artistResultSet.getInt(1);
+        final String firstName = resultSet.getString("FirstName");
+        final String lastName = resultSet.getString("LastName");
+        final String phone = resultSet.getString("Phone");
+        final String email = resultSet.getString("Email");
 
-        System.out.println("Saisir le nom de l'album à ajouter :");
-        final String album = scanner.nextLine();
+        String newFirstName = null;
+        String newLastName = null;
+        String newPhone = null;
+        String newEmail = null;
+        int userChoice = 0;
 
-        System.out.println("Ajout de l'album : " + album);
+        do
+        {
+          System.out.println("Informations clientes trouvées !");
+          System.out.println("Quelle information souhaitez-vous mettre à jour ?");
+          System.out.println("1. Prénom");
+          System.out.println("2. Nom");
+          System.out.println("3. Téléphone");
+          System.out.println("4. Email");
 
-        final PreparedStatement albumStatement = connection.prepareStatement("INSERT INTO albums (Title, ArtistId) VALUES (?, ?)");
-        albumStatement.setString(1, album);
-        albumStatement.setInt(2, artistId);
-        albumStatement.executeUpdate();
+          userChoice = scanner.nextInt();
+          scanner.nextLine();
+        } while (userChoice < 1 || userChoice > 4);
 
-        albumStatement.close();
+        System.out.println("Saisir la nouvelle valeur :");
+        final String newValue = scanner.nextLine();
+
+        System.out.println("Valeur a insérer : " + newValue);
+
+        switch (userChoice)
+        {
+          case 1:
+            newFirstName = newValue;
+            break;
+
+          case 2:
+            newLastName = newValue;
+            break;
+
+          case 3:
+            newPhone = newValue;
+            break;
+
+          case 4:
+            newEmail = newValue;
+            break;
+        }
+
+        final PreparedStatement updateStatement = connection.prepareStatement("UPDATE customers " +
+            "SET FirstName = ?," +
+            "LastName = ?," +
+            "Phone = ?," +
+            "Email = ? " +
+            "WHERE CustomerId = ?");
+
+        updateStatement.setString(1, newFirstName == null ? firstName : newFirstName);
+        updateStatement.setString(2, newLastName == null ? lastName : newLastName);
+        updateStatement.setString(3, newPhone == null ? phone : newPhone);
+        updateStatement.setString(4, newEmail == null ? email : newEmail);
+        updateStatement.setInt(5, customerId);
+
+        final int count = updateStatement.executeUpdate();
+
+        System.out.println(count + " ligne a bien été MAJ");
+
+        updateStatement.close();
       }
-      else
-      {
-        //issue
-      }
 
-      artistResultSet.close();
-      artistStatement.close();
+      resultSet.close();
+      customer.close();
 
       connection.close();
     }
