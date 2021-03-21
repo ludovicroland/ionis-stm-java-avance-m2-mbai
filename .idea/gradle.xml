@@ -9,6 +9,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/exercice1" />
+            <option value="$PROJECT_DIR$/exercice2" />
           </set>
         </option>
       </GradleProjectSettings>
